@@ -402,7 +402,9 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
         builders: RSQLBuilderBase<TSelector, TCustomComparisonOperator>[],
         options: RSQLBuilderOptions<TCustomComparisonOperator> = {}
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
-        return new RSQLBuilderBase<TSelector, TCustomComparisonOperator>(options).merge(builders);
+        return new RSQLBuilderBase<TSelector, TCustomComparisonOperator>(options).merge(
+            builders.filter((b) => b !== undefined && !b.isEmpty())
+        );
     }
 }
 
