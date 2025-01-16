@@ -1,18 +1,12 @@
 {
     "name": "rsql-query-builder",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Library for building RSQL query strings.",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
     "browser": "dist/index.global.js",
     "types": "dist/index.d.ts",
-    "exports": {
-        ".": {
-            "import": "./dist/index.mjs",
-            "require": "./dist/index.js",
-            "browser": "./dist/index.global.js"
-        }
-    },
+    
     "scripts": {
         "build": "tsup",
         "test": "vitest run"
