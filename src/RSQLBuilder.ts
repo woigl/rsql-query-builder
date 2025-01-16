@@ -6,7 +6,7 @@ import RSQLBuilderBase, { RSQLBuilderOptions } from './RSQLBuilderBase';
  *
  * @template TSelector - The type of the selector. It is used to define the field names and is a list of strings.
  */
-class RSQLBuilder<TSelector extends string> extends RSQLBuilderBase<TSelector, never> {
+class RSQLBuilder<TSelector extends string = string> extends RSQLBuilderBase<TSelector, never> {
     /** Create a new RSQL builder.
      *
      * @param options - The builder options
