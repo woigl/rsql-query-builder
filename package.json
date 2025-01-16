@@ -1,0 +1,41 @@
+{
+  "name": "rsql-query-builder",
+  "version": "1.0.0",
+  "description": "Library for building RSQL query strings.",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "browser": "dist/index.iife.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/woigl/rsql-query-builder.git"
+  },
+  "keywords": [
+    "rsql",
+    "query-builder",
+    "builder",
+    "javascript",
+    "typescript",
+    "nodejs",
+    "browser"
+  ],
+  "author": "Stefan Walter",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/woigl/rsql-query-builder/issues"
+  },
+  "homepage": "https://github.com/woigl/rsql-query-builder#readme",
+  "devDependencies": {
+    "@types/node": "^22.10.6",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}
