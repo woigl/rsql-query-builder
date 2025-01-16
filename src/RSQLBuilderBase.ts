@@ -1,6 +1,6 @@
 type LogicOperator = 'and' | 'or';
 
-type ComparisonOperator =
+type ComparisonOperatorDefault =
     | 'equal'
     | 'notEqual'
     | 'lessThan'
@@ -10,22 +10,9 @@ type ComparisonOperator =
     | 'in'
     | 'notIn';
 
-// type ComparisonOperatorRSQL = '==' | '!=' | '=lt=' | '=gt=' | '=le=' | '=ge=' | '=in=' | '=out=';
-
 type ComparisonOperators<TComparisonOperator extends string> = {
-    [key in TComparisonOperator]: string;
+    [key in TComparisonOperator]: { rsql: string; isArray?: boolean };
 };
-
-// const comparisonOperators: ComparisonOperators<ComparisonOperator> = {
-//     equal: '==',
-//     notEqual: '!=',
-//     lessThan: '=lt=',
-//     greaterThan: '=gt=',
-//     lessThanOrEqual: '=le=',
-//     greaterThanOrEqual: '=ge=',
-//     in: '=in=',
-//     notIn: '=out='
-// };
 
 /** RSQL builder options.
  *
@@ -34,57 +21,53 @@ type ComparisonOperators<TComparisonOperator extends string> = {
  */
 export interface RSQLBuilderOptions<TComparisonOperator extends string = never> {
     /* The default operator used if not explicitly specified */
-    defaultMissingOperator?: LogicOperator;
-    /* If true, it will replace the existing operator at the end of the string */
-    replaceExistingLogicOperator?: boolean;
+    defaultLogicOperator?: LogicOperator;
     /* Custom comparison operators */
     customComparisonOperators?: ComparisonOperators<TComparisonOperator>;
 }
 
-/** RSQL builder internal class
- * @see https://www.npmjs.com/package/rsql-mongodb
+/** RSQL builder base class
  *
- * @template TSelector - The type of the selector. It is used to define the field names and is a list of strings.
+ * This base class can be extended for speific builders to more comparison operator.
+ *
+ * @template TSelector - The type of the selector.
  */
 class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extends string> {
-    private readonly comparisonOperators: ComparisonOperators<ComparisonOperator> = {
-        equal: '==',
-        notEqual: '!=',
-        lessThan: '=lt=',
-        greaterThan: '=gt=',
-        lessThanOrEqual: '=le=',
-        greaterThanOrEqual: '=ge=',
-        in: '=in=',
-        notIn: '=out='
+    private readonly comparisonOperators: ComparisonOperators<ComparisonOperatorDefault> = {
+        equal: { rsql: '==' },
+        notEqual: { rsql: '!=' },
+        lessThan: { rsql: '=lt=' },
+        greaterThan: { rsql: '=gt=' },
+        lessThanOrEqual: { rsql: '=le=' },
+        greaterThanOrEqual: { rsql: '=ge=' },
+        in: { rsql: '=in=', isArray: true },
+        notIn: { rsql: '=out=', isArray: true }
     };
 
     private rsqlStr = '';
 
-    private defaultMissingOperator: LogicOperator = 'and';
+    private defaultLogicOperator: LogicOperator = 'and';
     private replaceExistingLogicOperator: boolean = true;
     private customComparisonOperators: ComparisonOperators<TCustomComparisonOperator> =
         {} as ComparisonOperators<TCustomComparisonOperator>;
 
-    /** Create a new RSQL builder.
+    /** Create a new RSQL builder base instance.
      *
      * @param options - The builder options
-     * @param options.defaultMissingOperator - The default operator used if not explicitly specified
-     * @param options.replaceExistingLogicOperator - If true, it will replace the existing operator at the end of the string
+     * @param options.defaultLogicOperator - The default operator used if not explicitly specified
      * @param options.customComparisonOperators - Custom comparison operators
+     *
      * @returns The builder instance
      * */
     constructor(options: RSQLBuilderOptions<TCustomComparisonOperator> = {}) {
-        if (options.defaultMissingOperator) this.defaultMissingOperator = options.defaultMissingOperator;
-
-        if (options.replaceExistingLogicOperator)
-            this.replaceExistingLogicOperator = options.replaceExistingLogicOperator;
-
+        if (options.defaultLogicOperator) this.defaultLogicOperator = options.defaultLogicOperator;
         if (options.customComparisonOperators) this.customComparisonOperators = options.customComparisonOperators;
     }
 
     /** Escape special characters.
      *
      * @param input - The input string to escape
+     *
      * @returns The escaped string
      */
     private escapeString(input: string): string {
@@ -96,7 +79,9 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     /** Convert a value to an escaped string.
      *
      * @param value - The value to convert
+     *
      * @returns The string representation of the value
+     *
      * @throws Error if the value type is not handled
      */
     private valueToString(
@@ -110,29 +95,29 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
         throw new Error('Unhandled value type.');
     }
 
-    /** Ensure that the string ends with an operator.
+    /** Ensure that the string ends with an logic operator.
      *
-     * @param logicOperator - The logic operator to append. If not supplied then it will use the default operator of the class options.
+     * @param logicOperator - The logic operator to append. If not supplied then it will use the default logic operator of the class options.
      */
     private ensureLogicOperator(logicOperator?: LogicOperator): void {
         if (this.rsqlStr.length === 0) return;
         if (!this.rsqlStr.endsWith(';') && !this.rsqlStr.endsWith(',')) {
-            this.appendLogicOperator(logicOperator || this.defaultMissingOperator);
+            this.appendLogicOperator(logicOperator || this.defaultLogicOperator);
         }
     }
 
     /** Removes AND and OR logic operators from end of the string */
-    private trimEndLogicOperator(): void {
+    private removeTrailingLogicOperator(): void {
         while (this.rsqlStr.endsWith(';') || this.rsqlStr.endsWith(',')) this.rsqlStr = this.rsqlStr.slice(0, -1);
     }
 
-    /** Append an AND or OR operator.
+    /** Append an AND or OR logic operator.
      * In case if there is an existing operator at the end of the string, it will be replaced.
      *
      * @param operator - The operator to append
      */
     private appendLogicOperator(logicOperator: LogicOperator): void {
-        if (this.replaceExistingLogicOperator) this.trimEndLogicOperator();
+        if (this.replaceExistingLogicOperator) this.removeTrailingLogicOperator();
 
         switch (logicOperator) {
             case 'or':
@@ -147,30 +132,40 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
 
     /** Add a comparison.
      *
-     * @param field - The field name
+     * @param selector - The selector name
      * @param comparisonOperator - The comparison operator
      * @param value - The value to compare
+     *
      * @returns The builder instance
+     *
      * @throws Error if the comparison operator is invalid
+     * @throws Error if the value is an array and the operator does not support arrays
      * */
     protected addComparison(
-        field: TSelector,
-        comparisonOperator: ComparisonOperator | TCustomComparisonOperator,
+        selector: TSelector,
+        comparisonOperator: ComparisonOperatorDefault | TCustomComparisonOperator,
         value: string | number | boolean | Date | null | Array<string | number | boolean | Date | null>
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
         this.ensureLogicOperator();
 
         const operator =
             this.customComparisonOperators[comparisonOperator as TCustomComparisonOperator] ||
-            this.comparisonOperators[comparisonOperator as ComparisonOperator];
+            this.comparisonOperators[comparisonOperator as ComparisonOperatorDefault];
 
         if (!operator) throw new Error(`Invalid comparison operator '${operator}'.`);
 
-        if (Array.isArray(value)) {
-            const strArray = value.map((value) => this.valueToString(value));
-            this.rsqlStr += field + operator + '(' + strArray.join(',') + ')';
+        if (operator.isArray === true) {
+            const strArray = Array.isArray(value)
+                ? value.map((value) => this.valueToString(value))
+                : [this.valueToString(value)];
+
+            this.rsqlStr += selector + operator.rsql + '(' + strArray.join(',') + ')';
         } else {
-            this.rsqlStr += field + operator + this.valueToString(value);
+            if (Array.isArray(value)) {
+                throw new Error(`Non-array comparison operator '${operator}' does not support array values.`);
+            }
+
+            this.rsqlStr += selector + operator.rsql + this.valueToString(value);
         }
 
         return this;
@@ -202,7 +197,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
         return this.rsqlStr.length === 0;
     }
 
-    /** Reset the builder.
+    /** Reset the builder to be empty.
      *
      * @returns The builder instance
      */
@@ -217,6 +212,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      * This concatenates a RSQL builder to the current builder on the same level.
      *
      * @param builder - The builder to append
+     *
      * @returns The builder instance
      */
     public concat(
@@ -235,8 +231,8 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      *
      * @param builders - The builders to merge.
      * @param options - The merge options.
-     * @param options.operator - The operator to use for merging. If not supplied then it will use the default operator of the class options.
-     * @param options.envelopeInGroup - If true, the merged builders will be enveloped in a group instead of being merged flat as is.
+     * @param options.operator - The logic operator to be used for merging. If not supplied then it will use the default logic operator of the class options.
+     *
      * @returns The builder instance
      */
     public merge(
@@ -251,7 +247,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
         return this;
     }
 
-    /** Add an AND link.
+    /** Add an AND logic operator.
      *
      * @returns The builder instance
      */
@@ -260,7 +256,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
         return this;
     }
 
-    /** Add an OR link.
+    /** Add an OR logc operator.
      *
      * @returns The builder instance
      */
@@ -272,6 +268,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     /** Add a condition group.
      *
      * @param builder - The builder to form the group
+     *
      * @returns The builder instance
      */
     public group(builder: RSQLBuilderBase<TSelector, TCustomComparisonOperator>) {
@@ -282,124 +279,128 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
 
     /** Add an EQUALS condition.
      *
-     * @param field - The field name
+     * @param selector - The selector name
      * @param value - The value to compare
+     *
      * @returns The builder instance
      */
     public equal(
-        field: TSelector,
-        value: string | number | Date | null
+        selector: TSelector,
+        value: string | number | boolean | Date | null
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
-        return this.addComparison(field, 'equal', value);
+        return this.addComparison(selector, 'equal', value);
     }
 
     /** Add a NOT EQUALS condition.
      *
-     * @param field - The field name
+     * @param selector - The selector name
      * @param value - The value to compare
+     *
      * @returns The builder instance
      */
     public notEqual(
-        field: TSelector,
-        value: string | number | Date | null
+        selector: TSelector,
+        value: string | number | boolean | Date | null
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
-        return this.addComparison(field, 'notEqual', value);
+        return this.addComparison(selector, 'notEqual', value);
     }
 
     /** Add a LESS THAN condition.
      *
-     * @param field - The field name
+     * @param selector - The selector name
      * @param value - The value to compare
+     *
      * @returns The builder instance
      */
     public lessThan(
-        field: TSelector,
+        selector: TSelector,
         value: string | number | Date | null
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
-        return this.addComparison(field, 'lessThan', value);
+        return this.addComparison(selector, 'lessThan', value);
     }
 
     /** Add a LESS THAN OR EQUALS condition.
      *
-     * @param field - The field name
+     * @param selector - The selector name
      * @param value - The value to compare
+     *
      * @returns The builder instance
      */
     public lessThanOrEqual(
-        field: TSelector,
+        selector: TSelector,
         value: string | number | Date | null
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
-        return this.addComparison(field, 'lessThanOrEqual', value);
+        return this.addComparison(selector, 'lessThanOrEqual', value);
     }
 
     /** Add a GREATER THAN condition.
      *
-     * @param field - The field name
+     * @param selector - The selector name
      * @param value - The value to compare
+     *
      * @returns The builder instance
      */
     public greaterThan(
-        field: TSelector,
+        selector: TSelector,
         value: string | number | Date | null
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
-        return this.addComparison(field, 'greaterThan', value);
+        return this.addComparison(selector, 'greaterThan', value);
     }
 
     /** Add a GREATER THAN OR EQUALS condition.
      *
-     * @param field - The field name
+     * @param selector - The selector name
      * @param value - The value to compare
+     *
      * @returns The builder instance
      */
     public greaterThanOrEquals(
-        field: TSelector,
+        selector: TSelector,
         value: string | number | Date | null
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
-        return this.addComparison(field, 'greaterThanOrEqual', value);
+        return this.addComparison(selector, 'greaterThanOrEqual', value);
     }
 
     /** Add a IN condition.
      *
-     * @param field - The field name
+     * @param selector - The selector name
      * @param values - The values to compare
      * @returns The builder instance
      */
     public in(
-        field: TSelector,
+        selector: TSelector,
         values: Array<string | number | boolean | null>
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
-        return this.addComparison(field, 'in', values);
+        return this.addComparison(selector, 'in', values);
     }
 
     /** Add a NOT IN condition.
      *
-     * @param field - The field name
+     * @param selector - The selector name
      * @param values - The values to compare
+     *
      * @returns The builder instance
      */
     public notIn(
-        field: TSelector,
+        selector: TSelector,
         values: Array<string | number | boolean | null>
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
-        return this.addComparison(field, 'notIn', values);
+        return this.addComparison(selector, 'notIn', values);
     }
 
     /** Merge multiple RSQL builders.
-     * 
+     *
      * This is a static method that merges multiple RSQL builders into a single builder, each one encapsulated in a group.
      *
-     * @param builders - The builders to merge.
      * @param options - The merge options.
      * @param options.operator - The operator to use for merging. If not supplied then it will use the default operator of the class options.
-     * @param options.envelopeInGroup - If true, the merged builders will be enveloped in a group instead of being merged flat as is.
+     * @param builders - The builders to merge.
+     *
      * @returns The merged builder.
      */
-    static merge<
-        TSelector extends string,
-        TCustomComparisonOperator extends string
-    >(
-        options: RSQLBuilderOptions<TCustomComparisonOperator> = {},
-        builders: RSQLBuilderBase<TSelector, TCustomComparisonOperator>[]
+    static merge<TSelector extends string, TCustomComparisonOperator extends string>(
+        builders: RSQLBuilderBase<TSelector, TCustomComparisonOperator>[],
+        options: RSQLBuilderOptions<TCustomComparisonOperator> = {}
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
         return new RSQLBuilderBase<TSelector, TCustomComparisonOperator>(options).merge(builders);
     }
