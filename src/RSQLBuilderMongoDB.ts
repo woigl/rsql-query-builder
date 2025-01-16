@@ -1,17 +1,17 @@
 // Reference https://www.npmjs.com/package/rsql-mongodb
 
-import RSQLBuilder, { RSQLBuilderOptions } from './RSQLBuilder.js';
+import RSQLBuilderBase, { RSQLBuilderOptions } from "./RSQLBuilderBase";
 
-type MongoDbComparisonOperator = 'regex' | 'notRegex' | 'exists';
-type MongoDbComparisonOperatorRSQL = '=regex=' | '=notregex=' | '=exists=';
+
+type ComparisonOperator = 'regex' | 'notRegex' | 'exists';
 
 /** RSQL Query Builder for MongoDB.
  *
  * @template Selector - The type of the selector. It is used to define the field names and is a list of strings.
  */
-class RSQLBuilderMongoDb<Selector extends string> extends RSQLBuilder<Selector, MongoDbComparisonOperator, MongoDbComparisonOperatorRSQL> {
+class RSQLBuilderMongoDb<TSelector extends string> extends RSQLBuilderBase<TSelector, ComparisonOperator> {
     constructor(
-        options: RSQLBuilderOptions<MongoDbComparisonOperator, MongoDbComparisonOperatorRSQL> = {
+        options: RSQLBuilderOptions<ComparisonOperator> = {
             customComparisonOperators: {
                 regex: '=regex=',
                 notRegex: '=notregex=',
@@ -31,7 +31,7 @@ class RSQLBuilderMongoDb<Selector extends string> extends RSQLBuilder<Selector, 
      *
      * @see https://www.mongodb.com/docs/manual/reference/operator/query/regex/
      */
-    public regex(field: Selector, regex: string, options?: string): RSQLBuilderMongoDb<Selector> {
+    public regex(field: TSelector, regex: string, options?: string): RSQLBuilderMongoDb<TSelector> {
         super.addComparison(field, 'regex', regex);
         return this;
     }
@@ -45,7 +45,7 @@ class RSQLBuilderMongoDb<Selector extends string> extends RSQLBuilder<Selector, 
      *
      * @see https://www.mongodb.com/docs/manual/reference/operator/query/regex/
      */
-    public notRegex(field: Selector, regex: string, options?: string): RSQLBuilder<Selector> {
+    public notRegex(field: TSelector, regex: string, options?: string): RSQLBuilderMongoDb<TSelector> {
         super.addComparison(field, 'notRegex', regex);
         return this;
     }
@@ -59,7 +59,7 @@ class RSQLBuilderMongoDb<Selector extends string> extends RSQLBuilder<Selector, 
      *
      * @see https://www.mongodb.com/docs/manual/reference/operator/query/regex/
      */
-    public like(field: Selector, regex: string, options?: string): RSQLBuilder<Selector> {
+    public like(field: TSelector, regex: string, options?: string): RSQLBuilderMongoDb<TSelector> {
         return this.regex(field, regex, options);
     }
 
@@ -72,7 +72,7 @@ class RSQLBuilderMongoDb<Selector extends string> extends RSQLBuilder<Selector, 
      *
      * @see https://www.mongodb.com/docs/manual/reference/operator/query/regex/
      */
-    public notLike(field: Selector, regex: string, options?: string): RSQLBuilder<Selector> {
+    public notLike(field: TSelector, regex: string, options?: string): RSQLBuilderMongoDb<TSelector> {
         return this.notRegex(field, regex, options);
     }
 
@@ -81,7 +81,7 @@ class RSQLBuilderMongoDb<Selector extends string> extends RSQLBuilder<Selector, 
      * @param field - The field name
      * @returns The builder instance
      */
-    public exists(field: Selector): RSQLBuilder<Selector> {
+    public exists(field: TSelector): RSQLBuilderMongoDb<TSelector> {
         super.addComparison(field, 'exists', true);
         return this;
     }
@@ -91,7 +91,7 @@ class RSQLBuilderMongoDb<Selector extends string> extends RSQLBuilder<Selector, 
      * @param field - The field name
      * @returns The builder instance
      */
-    public notExists(field: Selector): RSQLBuilder<Selector> {
+    public notExists(field: TSelector): RSQLBuilderMongoDb<TSelector> {
         super.addComparison(field, 'exists', false);
         return this;
     }
