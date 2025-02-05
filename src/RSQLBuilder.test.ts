@@ -47,4 +47,14 @@ describe('RSQLBuilder', () => {
     it("Test operator Greater Than Or Equal ('=ge=')", () => {
         expect(new RSQLBuilder().greaterThanOrEqual('age', 30).toString()).toBe('age=ge=30');
     });
+
+    it("Test logic operator AND (';')", () => {
+        expect(new RSQLBuilder().and().toString()).toBe(';');
+        expect(new RSQLBuilder().equal('name', 'John').and().equal('age', 30).toString()).toBe('name=="John";age==30');
+    });
+
+    it("Test logic operator OR (',')", () => {
+        expect(new RSQLBuilder().and().toString()).toBe(';');
+        expect(new RSQLBuilder().equal('name', 'John').or().equal('age', 30).toString()).toBe('name=="John",age==30');
+    });
 });
