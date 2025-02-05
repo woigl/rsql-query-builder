@@ -7,7 +7,9 @@
     "browser": "dist/index.global.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "build": "tsup",
+        "clean": "rm -rf dist",
+        "build": "npm run clean && tsup",
+        "publish": "npm run build && npm publish",
         "test": "vitest run"
     },
     "files": [
