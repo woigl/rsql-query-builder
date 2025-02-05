@@ -59,7 +59,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      *
      * @returns The builder instance
      * */
-    constructor(options: RSQLBuilderOptions<TCustomComparisonOperator> = {}) {
+    protected constructor(options: RSQLBuilderOptions<TCustomComparisonOperator> = {}) {
         if (options.defaultLogicOperator) this.defaultLogicOperator = options.defaultLogicOperator;
         if (options.customComparisonOperators) this.customComparisonOperators = options.customComparisonOperators;
     }
@@ -145,7 +145,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
         selector: TSelector,
         comparisonOperator: ComparisonOperatorDefault | TCustomComparisonOperator,
         value: string | number | boolean | Date | null | Array<string | number | boolean | Date | null>
-    ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    ): this {
         this.ensureLogicOperator();
 
         const operator =
@@ -176,7 +176,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      * @param logicOperator - The logic operator
      * @returns The builder instance
      */
-    protected addLogicOperator(logicOperator: LogicOperator): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    protected addLogicOperator(logicOperator: LogicOperator): this {
         this.appendLogicOperator(logicOperator);
         return this;
     }
@@ -201,7 +201,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      *
      * @returns The builder instance
      */
-    public reset(): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    public reset(): this {
         this.rsqlStr = '';
 
         return this;
@@ -216,8 +216,8 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      * @returns The builder instance
      */
     public concat(
-        builder: RSQLBuilderBase<TSelector, TCustomComparisonOperator>
-    ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+        builder: this
+    ): this {
         if (!builder.isEmpty()) {
             this.ensureLogicOperator();
             this.rsqlStr += builder.toString();
@@ -236,9 +236,9 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      * @returns The builder instance
      */
     public merge(
-        builders: RSQLBuilderBase<TSelector, TCustomComparisonOperator>[],
+        builders: this[],
         options?: { operator?: LogicOperator }
-    ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    ): this {
         for (const builder of builders) {
             this.ensureLogicOperator(options?.operator);
             this.group(builder);
@@ -251,7 +251,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      *
      * @returns The builder instance
      */
-    public and(): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    public and(): this {
         this.appendLogicOperator('and');
         return this;
     }
@@ -260,7 +260,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      *
      * @returns The builder instance
      */
-    public or(): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    public or(): this {
         this.appendLogicOperator('or');
         return this;
     }
@@ -271,7 +271,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      *
      * @returns The builder instance
      */
-    public group(builder: RSQLBuilderBase<TSelector, TCustomComparisonOperator>) {
+    public group(builder: this) {
         this.ensureLogicOperator();
         this.rsqlStr += '(' + builder.toString() + ')';
         return this;
@@ -287,7 +287,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     public equal(
         selector: TSelector,
         value: string | number | boolean | Date | null
-    ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    ): this {
         return this.addComparison(selector, 'equal', value);
     }
 
@@ -301,7 +301,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     public notEqual(
         selector: TSelector,
         value: string | number | boolean | Date | null
-    ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    ): this {
         return this.addComparison(selector, 'notEqual', value);
     }
 
@@ -315,7 +315,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     public lessThan(
         selector: TSelector,
         value: string | number | Date | null
-    ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    ): this {
         return this.addComparison(selector, 'lessThan', value);
     }
 
@@ -329,7 +329,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     public lessThanOrEqual(
         selector: TSelector,
         value: string | number | Date | null
-    ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    ): this {
         return this.addComparison(selector, 'lessThanOrEqual', value);
     }
 
@@ -343,7 +343,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     public greaterThan(
         selector: TSelector,
         value: string | number | Date | null
-    ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    ): this {
         return this.addComparison(selector, 'greaterThan', value);
     }
 
@@ -357,7 +357,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     public greaterThanOrEquals(
         selector: TSelector,
         value: string | number | Date | null
-    ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    ): this {
         return this.addComparison(selector, 'greaterThanOrEqual', value);
     }
 
@@ -370,7 +370,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     public in(
         selector: TSelector,
         values: Array<string | number | boolean | null>
-    ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    ): this {
         return this.addComparison(selector, 'in', values);
     }
 
@@ -384,7 +384,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     public notIn(
         selector: TSelector,
         values: Array<string | number | boolean | null>
-    ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
+    ): this {
         return this.addComparison(selector, 'notIn', values);
     }
 
