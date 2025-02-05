@@ -21,5 +21,5 @@ $ npm install rsql-query-builder
 
 [npm-image]: https://img.shields.io/npm/v/rsql-mongodb.svg
 [npm-url]: https://npmjs.org/package/rsql-mongodb
-[coveralls-image]: https://coveralls.io/repos/github/Fizcko/rsql-mongodb/badge.svg?branch=master
-[coveralls-url]: https://coveralls.io/github/Fizcko/rsql-mongodb?branch=master
+[coveralls-image]: https://coveralls.io/repos/github/woigl/rsql-query-builder/badge.svg?branch=main
+[coveralls-url]: https://coveralls.io/github/woigl/rsql-query-builder?branch=main
