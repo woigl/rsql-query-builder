@@ -1,6 +1,6 @@
 type LogicOperator = 'and' | 'or';
 
-type ComparisonOperatorDefault =
+type ComparisonOperatorsDefault =
     | 'equal'
     | 'notEqual'
     | 'lessThan'
@@ -17,11 +17,17 @@ type ComparisonOperators<TComparisonOperator extends string> = {
 /** RSQL builder options.
  *
  * @template TComparisonOperator - The type of the custom comparison operators
- * @template TComparisonOperatorRSQL - The type of the custom comparison operators RSQL
  */
 export interface RSQLBuilderOptions<TComparisonOperator extends string = never> {
     /* The default operator used if not explicitly specified */
     defaultLogicOperator?: LogicOperator;
+}
+
+/** RSQL base builder options.
+ *
+ * @template TComparisonOperator - The type of the custom comparison operators
+ */
+interface RSQLBuilderBaseOptions<TComparisonOperator extends string = never> extends RSQLBuilderOptions<TComparisonOperator> {
     /* Custom comparison operators */
     customComparisonOperators?: ComparisonOperators<TComparisonOperator>;
 }
@@ -33,7 +39,7 @@ export interface RSQLBuilderOptions<TComparisonOperator extends string = never> 
  * @template TSelector - The type of the selector.
  */
 class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extends string> {
-    private readonly comparisonOperators: ComparisonOperators<ComparisonOperatorDefault> = {
+    private readonly comparisonOperators: ComparisonOperators<ComparisonOperatorsDefault> = {
         equal: { rsql: '==' },
         notEqual: { rsql: '!=' },
         lessThan: { rsql: '=lt=' },
@@ -59,7 +65,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      *
      * @returns The builder instance
      * */
-    protected constructor(options: RSQLBuilderOptions<TCustomComparisonOperator> = {}) {
+    protected constructor(options: RSQLBuilderBaseOptions<TCustomComparisonOperator> = {}) {
         if (options.defaultLogicOperator) this.defaultLogicOperator = options.defaultLogicOperator;
         if (options.customComparisonOperators) this.customComparisonOperators = options.customComparisonOperators;
     }
@@ -143,14 +149,14 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      * */
     protected addComparison(
         selector: TSelector,
-        comparisonOperator: ComparisonOperatorDefault | TCustomComparisonOperator,
+        comparisonOperator: ComparisonOperatorsDefault | TCustomComparisonOperator,
         value: string | number | boolean | Date | null | Array<string | number | boolean | Date | null>
     ): this {
         this.ensureLogicOperator();
 
         const operator =
             this.customComparisonOperators[comparisonOperator as TCustomComparisonOperator] ||
-            this.comparisonOperators[comparisonOperator as ComparisonOperatorDefault];
+            this.comparisonOperators[comparisonOperator as ComparisonOperatorsDefault];
 
         if (!operator) throw new Error(`Invalid comparison operator '${operator}'.`);
 
