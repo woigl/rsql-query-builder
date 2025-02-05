@@ -34,6 +34,7 @@
     "homepage": "https://github.com/woigl/rsql-query-builder#readme",
     "devDependencies": {
         "@types/node": "^22.10.6",
+        "@vitest/coverage-v8": "^3.0.5",
         "tsup": "^8.3.5",
         "typescript": "^5.7.3",
         "vitest": "^3.0.5"
