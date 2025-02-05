@@ -26,4 +26,25 @@ describe('RSQLBuilder', () => {
         expect(new RSQLBuilder().in('name', ['Filip', 'John']).toString()).toBe('name=in=("Filip","John")');
         expect(new RSQLBuilder().in('name', [30, 45]).toString()).toBe('name=in=(30,45)');
     });
+
+    it("Test operator Not In ('=out=')", () => {
+        expect(new RSQLBuilder().notIn('name', ['Filip', 'John']).toString()).toBe('name=out=("Filip","John")');
+        expect(new RSQLBuilder().notIn('name', [30, 45]).toString()).toBe('name=out=(30,45)');
+    });
+
+    it("Test operator Less Than ('=lt=')", () => {
+        expect(new RSQLBuilder().lessThan('age', 30).toString()).toBe('age=lt=30');
+    });
+
+    it("Test operator Greater Than ('=gt=')", () => {
+        expect(new RSQLBuilder().greaterThan('age', 30).toString()).toBe('age=gt=30');
+    });
+
+    it("Test operator Less Than Or Equal ('=le=')", () => {
+        expect(new RSQLBuilder().lessThanOrEqual('age', 30).toString()).toBe('age=le=30');
+    });
+
+    it("Test operator Greater Than Or Equal ('=ge=')", () => {
+        expect(new RSQLBuilder().greaterThanOrEqual('age', 30).toString()).toBe('age=ge=30');
+    });
 });
