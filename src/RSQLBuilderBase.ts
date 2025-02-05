@@ -319,7 +319,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
         return this.addComparison(selector, 'lessThan', value);
     }
 
-    /** Add a LESS THAN OR EQUALS condition.
+    /** Add a LESS THAN OR EQUAL condition.
      *
      * @param selector - The selector name
      * @param value - The value to compare
@@ -347,14 +347,14 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
         return this.addComparison(selector, 'greaterThan', value);
     }
 
-    /** Add a GREATER THAN OR EQUALS condition.
+    /** Add a GREATER THAN OR EQUAL condition.
      *
      * @param selector - The selector name
      * @param value - The value to compare
      *
      * @returns The builder instance
      */
-    public greaterThanOrEquals(
+    public greaterThanOrEqual(
         selector: TSelector,
         value: string | number | Date | null
     ): this {
