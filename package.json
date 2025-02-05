@@ -9,7 +9,7 @@
     "scripts": {
         "clean": "rm -rf dist",
         "build": "npm run clean && tsup",
-        "publish": "npm run build && npm publish",
+        "publish": "npm run test && npm run build && npm publish",
         "test": "vitest run"
     },
     "files": [
