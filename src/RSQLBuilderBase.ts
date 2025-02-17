@@ -95,7 +95,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     ): string {
         if (value === null) return 'null';
         if (typeof value === 'string') return '"' + this.escapeString(value) + '"';
-        if (typeof value === 'number') return value.toFixed();
+        if (typeof value === 'number') return value.toString();
         if (typeof value === 'boolean') return value === true ? 'true' : 'false';
         if (value instanceof Date) return value.toISOString();
         throw new Error('Unhandled value type.');
