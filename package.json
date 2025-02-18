@@ -1,6 +1,6 @@
 {
     "name": "rsql-query-builder",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "description": "Library for building RSQL query strings.",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
@@ -9,7 +9,7 @@
     "scripts": {
         "clean": "rm -rf dist",
         "build": "npm run clean && tsup",
-        "publish": "npm run test && npm run build && npm publish",
+        "publish-library": "npm run test && npm run build && npm publish",
         "test": "vitest run"
     },
     "files": [

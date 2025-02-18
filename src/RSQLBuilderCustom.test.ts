@@ -3,13 +3,14 @@ import { RSQLBuilder, RSQLBuilderBase, RSQLBuilderOptions } from '.';
 
 class RSQLBuilderCustom<TSelector extends string = string> extends RSQLBuilderBase<
     TSelector,
-    'isUpperCase' | 'isInGroup'
+    'isMonth' | 'isUpperCase' | 'isInGroup'
 > {
     constructor() {
         super({
             customComparisonOperators: {
                 equal: { rsql: '=eq=' },
                 notEqual: { rsql: '=neq=' },
+                isMonth: { rsql: '=im=' },
                 isUpperCase: { rsql: '=iuc=' },
                 isInGroup: { rsql: '=iic=', isArray: true }
             }
@@ -44,6 +45,17 @@ class RSQLBuilderCustom<TSelector extends string = string> extends RSQLBuilderBa
      */
     public isUpperCase(selector: TSelector): this {
         super.addComparison(selector, 'isUpperCase', true);
+        return this;
+    }
+
+    /**
+     * Function to test the custom comparison operator 'isUpperCase'
+     *
+     * @param selector - The selector name
+     * @returns The builder instance
+     */
+    public isMonth(selector: TSelector): this {
+        super.addComparison(selector, 'isMonth', true, 'i');
         return this;
     }
 
@@ -117,6 +129,10 @@ describe('RSQLBuilder', () => {
 
     it("Test custom comparison operator IS UPPER CASE ('=iuc=')", () => {
         expect(new RSQLBuilderCustom().isUpperCase('name').toString()).toBe('name=iuc=true');
+    });
+
+    it("Test custom comparison operator IS MONTH ('=im=true=i')", () => {
+        expect(new RSQLBuilderCustom().isMonth('month').toString()).toBe('month=im=true=i');
     });
 
     it("Test for exception 'Unhandled field value'", () => {
