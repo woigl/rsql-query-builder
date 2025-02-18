@@ -165,8 +165,9 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
         if (!operator) throw new Error(`Invalid comparison operator '${operator}'`);
 
         if (operator.isArray === true) {
-            if (!Array.isArray(value))
+            if (!Array.isArray(value)) {
                 throw new Error(`Array comparison operator '${operator}' requires an array value.`);
+            }
 
             const strArray = value.map((value) => this.valueToString(value));
 

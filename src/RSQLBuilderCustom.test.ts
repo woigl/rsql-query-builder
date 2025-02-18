@@ -1,30 +1,67 @@
 import { describe, it, expect } from 'vitest';
 import { RSQLBuilder, RSQLBuilderBase, RSQLBuilderOptions } from '.';
 
-class RSQLBuilderCustom<TSelector extends string = string> extends RSQLBuilderBase<TSelector, 'isUpperCase'> {
+class RSQLBuilderCustom<TSelector extends string = string> extends RSQLBuilderBase<
+    TSelector,
+    'isUpperCase' | 'isInGroup'
+> {
     constructor() {
         super({
             customComparisonOperators: {
                 equal: { rsql: '=eq=' },
                 notEqual: { rsql: '=neq=' },
-                isUpperCase: { rsql: '=iuc=' }
+                isUpperCase: { rsql: '=iuc=' },
+                isInGroup: { rsql: '=iic=', isArray: true }
             }
         });
     }
 
-    public isUpperCase(field: TSelector): this {
-        super.addComparison(field, 'isUpperCase', true);
+    /**
+     * Function to test the custom comparison operator 'isUpperCase'
+     *
+     * @param selector - The selector name
+     * @returns The builder instance
+     */
+    public isUpperCase(selector: TSelector): this {
+        super.addComparison(selector, 'isUpperCase', true);
         return this;
     }
 
-    public isUpperCase2(field: TSelector): this {
-        // mockup to test unhandled field value
-        super.addComparison(field, 'isUpperCase', this as unknown as string);
+    /**
+     * Mockup test for exception 'Unhandled field value'
+     *
+     * @param selector - The selector name
+     * @returns The builder instance
+     */
+    public testExceptionUnhandledValueType(selector: TSelector): this {
+        super.addComparison(selector, 'isUpperCase', this as unknown as string);
         return this;
     }
 
-    public isUpperCase3(field: TSelector): this {
-        super.addComparison(field, 'isUpperCase3' as unknown as 'isUpperCase', true);
+    /**
+     * Mockup test for exception 'Invalid comparison operator'
+     *
+     * @param selector - The selector name
+     * @returns The builder instance
+     */
+    public testExceptionInvalidComparisonOperator(selector: TSelector): this {
+        super.addComparison(selector, 'invalidComparisonOperator' as unknown as 'isUpperCase', true);
+        return this;
+    }
+
+    public testExceptionArrayComparisonOperatorRequiresArrayValue(
+        selector: TSelector,
+        value: string | number | boolean | null
+    ): this {
+        super.addComparison(selector, 'isInGroup', value);
+        return this;
+    }
+
+    public testExceptionNonArrayComparisonOperatorDoesNotSupportArrayValue(
+        selector: TSelector,
+        values: Array<string | number | boolean | null>
+    ): this {
+        super.addComparison(selector, 'isUpperCase', values);
         return this;
     }
 }
@@ -58,14 +95,28 @@ describe('RSQLBuilder', () => {
     });
 
     it("Test for exception 'Unhandled field value'", () => {
-        expect(() => new RSQLBuilderCustom().isUpperCase2('name').toString()).toThrowError(
+        expect(() => new RSQLBuilderCustom().testExceptionUnhandledValueType('name').toString()).toThrowError(
             expect.objectContaining({ message: 'Unhandled value type' })
         );
     });
 
     it("Test for exception 'Invalid comparison operator'", () => {
-        expect(() => new RSQLBuilderCustom().isUpperCase3('name').toString()).toThrowError(
+        expect(() => new RSQLBuilderCustom().testExceptionInvalidComparisonOperator('name').toString()).toThrowError(
             expect.objectContaining({ message: "Invalid comparison operator 'undefined'" })
         );
+    });
+
+    it("Test for exception 'Invalid comparison operator'", () => {
+        expect(() =>
+            new RSQLBuilderCustom().testExceptionArrayComparisonOperatorRequiresArrayValue('name', 15).toString()
+        ).toThrowError(expect.objectContaining({ message: "Array comparison operator '[object Object]' requires an array value." }));
+    });
+
+    it("Test for exception 'Invalid comparison operator'", () => {
+        expect(() =>
+            new RSQLBuilderCustom()
+                .testExceptionNonArrayComparisonOperatorDoesNotSupportArrayValue('name', [15, 30])
+                .toString()
+        ).toThrowError(expect.objectContaining({ message: "Non-array comparison operator '[object Object]' does not support array values." }));
     });
 });
