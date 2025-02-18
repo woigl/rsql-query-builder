@@ -16,6 +16,11 @@ class RSQLBuilderCustom<TSelector extends string = string> extends RSQLBuilderBa
         super.addComparison(field, 'isUpperCase', true);
         return this;
     }
+
+    public isUpperCase2(field: TSelector): this {
+        super.addComparison(field, 'isUpperCase', this as unknown as string);
+        return this;
+    }
 }
 
 describe('RSQLBuilder', () => {
@@ -44,5 +49,11 @@ describe('RSQLBuilder', () => {
 
     it("Test custom comparison operator IS UPPER CASE ('=iuc=')", () => {
         expect(new RSQLBuilderCustom().isUpperCase('name').toString()).toBe('name=iuc=true');
+    });
+
+    it('Test unhandled field value', () => {
+        expect(() => new RSQLBuilderCustom().isUpperCase2('name').toString()).toThrowError(
+            expect.objectContaining({ message: 'Unhandled value type' })
+        );
     });
 });
