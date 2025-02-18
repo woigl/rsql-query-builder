@@ -145,6 +145,7 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      * @param selector - The selector name
      * @param comparisonOperator - The comparison operator
      * @param value - The value to compare
+     * @param options - The options string for the comparison
      *
      * @returns The builder instance
      *
@@ -154,7 +155,8 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     protected addComparison(
         selector: TSelector,
         comparisonOperator: ComparisonOperatorsDefault | TCustomComparisonOperator,
-        value: string | number | boolean | Date | null | Array<string | number | boolean | Date | null>
+        value: string | number | boolean | Date | null | Array<string | number | boolean | Date | null>,
+        options?: string
     ): this {
         this.ensureLogicOperator();
 
@@ -164,6 +166,8 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
 
         if (!operator) throw new Error(`Invalid comparison operator '${operator}'`);
 
+        const optionsStr = options ? '=' + options : '';
+
         if (operator.isArray === true) {
             if (!Array.isArray(value)) {
                 throw new Error(`Array comparison operator '${operator}' requires an array value.`);
@@ -171,13 +175,13 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
 
             const strArray = value.map((value) => this.valueToString(value));
 
-            this.rsqlStr += selector + operator.rsql + '(' + strArray.join(',') + ')';
+            this.rsqlStr += selector + operator.rsql + '(' + strArray.join(',') + ')' + optionsStr;
         } else {
             if (Array.isArray(value)) {
                 throw new Error(`Non-array comparison operator '${operator}' does not support array values.`);
             }
 
-            this.rsqlStr += selector + operator.rsql + this.valueToString(value);
+            this.rsqlStr += selector + operator.rsql + this.valueToString(value) + optionsStr;
         }
 
         return this;
@@ -385,9 +389,9 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
         builders: RSQLBuilderBase<TSelector, TCustomComparisonOperator>[],
         options?: { logicOperator?: LogicOperator }
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
-        return new RSQLBuilderBase<TSelector, TCustomComparisonOperator>({defaultLogicOperator: options?.logicOperator}).merge(
-            builders.filter((b) => b !== undefined && !b.isEmpty())
-        );
+        return new RSQLBuilderBase<TSelector, TCustomComparisonOperator>({
+            defaultLogicOperator: options?.logicOperator
+        }).merge(builders.filter((b) => b !== undefined && !b.isEmpty()));
     }
 }
 
