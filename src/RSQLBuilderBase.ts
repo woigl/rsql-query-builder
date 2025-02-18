@@ -245,9 +245,9 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      *
      * @returns The builder instance
      */
-    public merge(builders: this[], options?: { operator?: LogicOperator }): this {
+    public merge(builders: this[], options?: { logicOperator?: LogicOperator }): this {
         for (const builder of builders) {
-            this.ensureLogicOperator(options?.operator);
+            this.ensureLogicOperator(options?.logicOperator);
             this.group(builder);
         }
 
@@ -383,9 +383,9 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
      */
     static merge<TSelector extends string, TCustomComparisonOperator extends string>(
         builders: RSQLBuilderBase<TSelector, TCustomComparisonOperator>[],
-        options: RSQLBuilderOptions<TCustomComparisonOperator> = {}
+        options?: { logicOperator?: LogicOperator }
     ): RSQLBuilderBase<TSelector, TCustomComparisonOperator> {
-        return new RSQLBuilderBase<TSelector, TCustomComparisonOperator>(options).merge(
+        return new RSQLBuilderBase<TSelector, TCustomComparisonOperator>({defaultLogicOperator: options?.logicOperator}).merge(
             builders.filter((b) => b !== undefined && !b.isEmpty())
         );
     }

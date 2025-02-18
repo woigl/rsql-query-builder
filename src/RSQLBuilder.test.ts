@@ -89,18 +89,67 @@ describe('RSQLBuilder', () => {
     });
 
     it('Test group()', () => {
-        expect(new RSQLBuilder().equal('name', 'John').and().group(new RSQLBuilder().equal('age', 30).or().equal('age', null)).toString()).toBe('name==\"John\";(age==30,age==null)');
+        expect(
+            new RSQLBuilder()
+                .equal('name', 'John')
+                .and()
+                .group(new RSQLBuilder().equal('age', 30).or().equal('age', null))
+                .toString()
+        ).toBe('name=="John";(age==30,age==null)');
     });
 
     it('Test concat()', () => {
-        expect(new RSQLBuilder().equal('name', 'John').concat(new RSQLBuilder().equal('age', 30).or().equal('age', null)).toString()).toBe('name==\"John\";age==30,age==null');
+        expect(
+            new RSQLBuilder()
+                .equal('name', 'John')
+                .concat(new RSQLBuilder().equal('age', 30).or().equal('age', null))
+                .toString()
+        ).toBe('name=="John";age==30,age==null');
     });
 
     it('Test merge()', () => {
-        expect(new RSQLBuilder().equal('name', 'John').merge([new RSQLBuilder().equal('age', 30).or().equal('age', null)]).toString()).toBe('name==\"John\";(age==30,age==null)');
+        expect(
+            new RSQLBuilder()
+                .equal('name', 'John')
+                .merge([new RSQLBuilder().equal('age', 30).or().equal('age', null)])
+                .toString()
+        ).toBe('name=="John";(age==30,age==null)');
+
+        expect(
+            new RSQLBuilder()
+                .equal('name', 'John')
+                .merge([new RSQLBuilder().equal('age', 30).or().equal('age', null)], { logicOperator: 'and' })
+                .toString()
+        ).toBe('name=="John";(age==30,age==null)');
+
+        expect(
+            new RSQLBuilder()
+                .equal('name', 'John')
+                .merge([new RSQLBuilder().equal('age', 30).or().equal('age', null)], { logicOperator: 'or' })
+                .toString()
+        ).toBe('name=="John",(age==30,age==null)');
     });
 
     it('Test static merge()', () => {
-        expect(RSQLBuilder.merge([new RSQLBuilder().equal('name', 'John'), new RSQLBuilder().equal('age', 30).or().equal('age', null)]).toString()).toBe('(name==\"John\");(age==30,age==null)');
+        expect(
+            RSQLBuilder.merge([
+                new RSQLBuilder().equal('name', 'John'),
+                new RSQLBuilder().equal('age', 30).or().equal('age', null)
+            ]).toString()
+        ).toBe('(name=="John");(age==30,age==null)');
+
+        expect(
+            RSQLBuilder.merge(
+                [new RSQLBuilder().equal('name', 'John'), new RSQLBuilder().equal('age', 30).or().equal('age', null)],
+                { logicOperator: 'and' }
+            ).toString()
+        ).toBe('(name=="John");(age==30,age==null)');
+
+        expect(
+            RSQLBuilder.merge(
+                [new RSQLBuilder().equal('name', 'John'), new RSQLBuilder().equal('age', 30).or().equal('age', null)],
+                { logicOperator: 'or' }
+            ).toString()
+        ).toBe('(name=="John"),(age==30,age==null)');
     });
 });
