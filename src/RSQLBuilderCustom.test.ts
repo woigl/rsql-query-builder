@@ -17,6 +17,26 @@ class RSQLBuilderCustom<TSelector extends string = string> extends RSQLBuilderBa
     }
 
     /**
+     * Mockup test for parent function addLogicOperator with 'and' operator
+     * 
+     * @returns The builder instance
+     */
+    public testAddLogicOperatorAnd(): this {
+        this.addLogicOperator('and');
+        return this;
+    }
+
+    /**
+     * Mockup test for parent function addLogicOperator with 'or' operator
+     * 
+     * @returns The builder instance
+     */
+    public testAddLogicOperatorOr(): this {
+        this.addLogicOperator('or');
+        return this;
+    }
+
+    /**
      * Function to test the custom comparison operator 'isUpperCase'
      *
      * @param selector - The selector name
@@ -67,6 +87,11 @@ class RSQLBuilderCustom<TSelector extends string = string> extends RSQLBuilderBa
 }
 
 describe('RSQLBuilder', () => {
+    it("Test parent function addLogicOperator", () => {
+        expect(new RSQLBuilderCustom().equal('name', 'Filip').testAddLogicOperatorAnd().equal('name', 'John').toString()).toBe('name=eq="Filip";name=eq="John"');
+        expect(new RSQLBuilderCustom().equal('name', 'Filip').testAddLogicOperatorOr().equal('name', 'John').toString()).toBe('name=eq="Filip",name=eq="John"');
+    });
+
     it("Test custom comparison operator EQUAL ('=eq=')", () => {
         expect(new RSQLBuilderCustom().equal('name', 'Filip').toString()).toBe('name=eq="Filip"');
         expect(new RSQLBuilderCustom().equal('age', 30).toString()).toBe('age=eq=30');
