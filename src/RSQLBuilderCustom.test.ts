@@ -18,7 +18,13 @@ class RSQLBuilderCustom<TSelector extends string = string> extends RSQLBuilderBa
     }
 
     public isUpperCase2(field: TSelector): this {
+        // mockup to test unhandled field value
         super.addComparison(field, 'isUpperCase', this as unknown as string);
+        return this;
+    }
+
+    public isUpperCase3(field: TSelector): this {
+        super.addComparison(field, 'isUpperCase3' as unknown as 'isUpperCase', true);
         return this;
     }
 }
@@ -51,9 +57,15 @@ describe('RSQLBuilder', () => {
         expect(new RSQLBuilderCustom().isUpperCase('name').toString()).toBe('name=iuc=true');
     });
 
-    it('Test unhandled field value', () => {
+    it("Test for exception 'Unhandled field value'", () => {
         expect(() => new RSQLBuilderCustom().isUpperCase2('name').toString()).toThrowError(
             expect.objectContaining({ message: 'Unhandled value type' })
+        );
+    });
+
+    it("Test for exception 'Invalid comparison operator'", () => {
+        expect(() => new RSQLBuilderCustom().isUpperCase3('name').toString()).toThrowError(
+            expect.objectContaining({ message: "Invalid comparison operator 'undefined'" })
         );
     });
 });
