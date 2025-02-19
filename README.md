@@ -32,7 +32,7 @@ The `RSQLBuilder` class provides many methods to build the desired RSQL string.
 
 ### Initialization
 
-constructor()
+`constructor()` – Initializes a new RSQLBuilder instance.
 
 ### Comparisons Operators (Defining Conditions)
 
