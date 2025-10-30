@@ -19,7 +19,7 @@ class RSQLBuilderCustom<TSelector extends string = string> extends RSQLBuilderBa
 
     /**
      * Mockup test for parent function addLogicOperator with 'and' operator
-     * 
+     *
      * @returns The builder instance
      */
     public testAddLogicOperatorAnd(): this {
@@ -29,7 +29,7 @@ class RSQLBuilderCustom<TSelector extends string = string> extends RSQLBuilderBa
 
     /**
      * Mockup test for parent function addLogicOperator with 'or' operator
-     * 
+     *
      * @returns The builder instance
      */
     public testAddLogicOperatorOr(): this {
@@ -99,9 +99,13 @@ class RSQLBuilderCustom<TSelector extends string = string> extends RSQLBuilderBa
 }
 
 describe('RSQLBuilder', () => {
-    it("Test parent function addLogicOperator", () => {
-        expect(new RSQLBuilderCustom().equal('name', 'Filip').testAddLogicOperatorAnd().equal('name', 'John').toString()).toBe('name=eq="Filip";name=eq="John"');
-        expect(new RSQLBuilderCustom().equal('name', 'Filip').testAddLogicOperatorOr().equal('name', 'John').toString()).toBe('name=eq="Filip",name=eq="John"');
+    it('Test parent function addLogicOperator', () => {
+        expect(
+            new RSQLBuilderCustom().equal('name', 'Filip').testAddLogicOperatorAnd().equal('name', 'John').toString()
+        ).toBe('name=eq="Filip";name=eq="John"');
+        expect(
+            new RSQLBuilderCustom().equal('name', 'Filip').testAddLogicOperatorOr().equal('name', 'John').toString()
+        ).toBe('name=eq="Filip",name=eq="John"');
     });
 
     it("Test custom comparison operator EQUAL ('=eq=')", () => {
@@ -150,7 +154,9 @@ describe('RSQLBuilder', () => {
     it("Test for exception 'Invalid comparison operator'", () => {
         expect(() =>
             new RSQLBuilderCustom().testExceptionArrayComparisonOperatorRequiresArrayValue('name', 15).toString()
-        ).toThrowError(expect.objectContaining({ message: "Array comparison operator '[object Object]' requires an array value." }));
+        ).toThrowError(
+            expect.objectContaining({ message: "Array comparison operator '[object Object]' requires an array value." })
+        );
     });
 
     it("Test for exception 'Invalid comparison operator'", () => {
@@ -158,6 +164,19 @@ describe('RSQLBuilder', () => {
             new RSQLBuilderCustom()
                 .testExceptionNonArrayComparisonOperatorDoesNotSupportArrayValue('name', [15, 30])
                 .toString()
-        ).toThrowError(expect.objectContaining({ message: "Non-array comparison operator '[object Object]' does not support array values." }));
+        ).toThrowError(
+            expect.objectContaining({
+                message: "Non-array comparison operator '[object Object]' does not support array values."
+            })
+        );
+    });
+
+    it('Test not to append logic operator at the beginning of the RSQL string', () => {
+        expect(new RSQLBuilderCustom().testAddLogicOperatorAnd().equal('name', 'John').toString()).toBe(
+            'name=eq="John"'
+        );
+        expect(new RSQLBuilderCustom().testAddLogicOperatorOr().equal('name', 'John').toString()).toBe(
+            'name=eq="John"'
+        );
     });
 });

@@ -52,31 +52,31 @@ describe('RSQLBuilder', () => {
     });
 
     it("Test logic operator AND (';')", () => {
-        expect(new RSQLBuilder().and().toString()).toBe(';');
+        expect(new RSQLBuilder().and().toString()).toBe(''); // is stripped out
         expect(new RSQLBuilder().equal('name', 'John').and().equal('age', 30).toString()).toBe('name=="John";age==30');
     });
 
     it("Test logic operator OR (',')", () => {
-        expect(new RSQLBuilder().or().toString()).toBe(',');
+        expect(new RSQLBuilder().or().toString()).toBe(''); // is stripped out
         expect(new RSQLBuilder().equal('name', 'John').or().equal('age', 30).toString()).toBe('name=="John",age==30');
     });
 
     it("Test default logic operator AND (';')", () => {
-        expect(new RSQLBuilder({ defaultLogicOperator: 'and' }).and().toString()).toBe(';');
+        expect(new RSQLBuilder({ defaultLogicOperator: 'and' }).and().toString()).toBe(''); // is stripped out
         expect(new RSQLBuilder({ defaultLogicOperator: 'and' }).equal('name', 'John').equal('age', 30).toString()).toBe(
             'name=="John";age==30'
         );
     });
 
     it("Test default logic operator OR (',')", () => {
-        expect(new RSQLBuilder({ defaultLogicOperator: 'or' }).or().toString()).toBe(',');
+        expect(new RSQLBuilder({ defaultLogicOperator: 'or' }).or().toString()).toBe(''); // is stripped out
         expect(new RSQLBuilder({ defaultLogicOperator: 'or' }).equal('name', 'John').equal('age', 30).toString()).toBe(
             'name=="John",age==30'
         );
     });
 
     it('Test prevent consecutive occurence of logic operators', () => {
-        expect(new RSQLBuilder().and().or().and().and().or().or().and().toString()).toBe(';');
+        expect(new RSQLBuilder().and().or().and().and().or().or().and().toString()).toBe(''); // is stripped out
         expect(
             new RSQLBuilder().equal('name', 'John').and().or().and().and().or().or().and().equal('age', 30).toString()
         ).toBe('name=="John";age==30');

@@ -129,6 +129,9 @@ class RSQLBuilderBase<TSelector extends string, TCustomComparisonOperator extend
     private appendLogicOperator(logicOperator: LogicOperator): void {
         if (this.replaceExistingLogicOperator) this.removeTrailingLogicOperator();
 
+        // We only append the operator if there is something in the string
+        if (this.rsqlStr.length === 0) return;
+
         switch (logicOperator) {
             case 'or':
                 this.rsqlStr += ',';

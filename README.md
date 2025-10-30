@@ -32,42 +32,42 @@ The `RSQLBuilder` class provides many methods to build the desired RSQL string.
 
 ### Initialization
 
-`constructor(options)` – Initializes a new `RSQLBuilder` instance.
+-   `constructor(options)` – Initializes a new `RSQLBuilder` instance.
 
 ### Comparisons Operators (Defining Conditions)
 
-`equal(selector, value)` - Appends a condition `selector == value`.
-`notEqual(selector, value)` - Appends a condition `selector != value`.
-`lessThan(selector, value)` - Appends a condition `selector =lt= value`.
-`lessThanOrEqual(selector, value)` - Appends a condition `selector =le= value`.
-`greaterThan(selector, value)` - Appends a condition `selector =gr= value`.
-`greaterThanOrEqual(selector, value)` - Appends a condition `selector =ge= value`.
-`in(selector, values)` - Appends a condition `selector =in= (values)`.
-`notIn(selector, value)` - Appends a condition `selector =out= (values)`.
+-   `equal(selector, value)` - Appends a condition `selector == value`.
+-   `notEqual(selector, value)` - Appends a condition `selector != value`.
+-   `lessThan(selector, value)` - Appends a condition `selector =lt= value`.
+-   `lessThanOrEqual(selector, value)` - Appends a condition `selector =le= value`.
+-   `greaterThan(selector, value)` - Appends a condition `selector =gr= value`.
+-   `greaterThanOrEqual(selector, value)` - Appends a condition `selector =ge= value`.
+-   `in(selector, values)` - Appends a condition `selector =in= (values)`.
+-   `notIn(selector, value)` - Appends a condition `selector =out= (values)`.
 
 ### Expression Grouping (Organizing Conditions)
 
-`group(builder)` - Wraps the conditions from another RSQLBuilder instance in parentheses for grouping.
+-   `group(builder)` - Wraps the conditions from another RSQLBuilder instance in parentheses for grouping.
 
 ### Logical Operators (Combining Conditions)
 
-`and()` – Appends the logical **AND** operator `;`.
-`or()` - Appends a logical **OR** operator `,`.
+-   `and()` – Appends the logical **AND** operator `;`.
+-   `or()` - Appends a logical **OR** operator `,`.
 
 ### RSQL Builder Composition (Combining Multiple RSQL Queries)
 
-`concat(builder)` – Appends all expressions from another RSQLBuilder instance to the current instance.
-`merge(builders)` – Merges multiple RSQLBuilder instances into grouped conditions.
+-   `concat(builder)` – Appends all expressions from another RSQLBuilder instance to the current instance.
+-   `merge(builders)` – Merges multiple RSQLBuilder instances into grouped conditions.
 
 ### RSQL String Management (Finalizing the Query)
 
-`toString()` - Returns the generated RSQL query string.
-`isEmpty()` – Returns true if the RSQLBuilder instance has no expressions; otherwise, returns false.
-`reset()` – Clears all expressions, resetting the RSQLBuilder instance.
+-   `toString()` - Returns the generated RSQL query string.
+-   `isEmpty()` – Returns true if the RSQLBuilder instance has no expressions; otherwise, returns false.
+-   `reset()` – Clears all expressions, resetting the RSQLBuilder instance.
 
 ### Static Utilities
 
-`merge(builders)` – Creates a new RSQLBuilder instance and merges multiple RSQLBuilder instances into grouped conditions.
+-   `merge(builders)` – Creates a new RSQLBuilder instance and merges multiple RSQLBuilder instances into grouped conditions.
 
 ## Extending the RSQL Query Builder
 
